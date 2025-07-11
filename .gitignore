@@ -1,0 +1,6 @@
+/.idea
+/.venv
+/anon.session
+/.env
+/__pycache__
+.DS_Store

@@ -1,0 +1,7 @@
+telethon
+aiogram
+APScheduler
+python-dotenv
+openai
+pyyaml
+tiktoken

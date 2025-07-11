@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    restart: unless-stopped
+    container_name: ConvoDigestBot
+    working_dir: /app 
