@@ -7,11 +7,11 @@ import tiktoken
 from typing import List, Dict
 from openai import AsyncOpenAI
 from src.llm.prompts import REPORT_PROMPT, SYSTEM_PROMPT
-from src.config.config import get_config
+from src.config.config import load_config
 
 from src.config.schemas import RESPONSE_FORMAT
 
-config = get_config()
+config = load_config()
 OPENAI_API_KEY = config['OPENAI_API_KEY']
 OPENAI_API_BASE_URL = config['OPENAI_API_BASE_URL']
 OPENAI_API_MODEL = config['OPENAI_API_MODEL']

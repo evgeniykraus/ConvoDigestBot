@@ -1,14 +1,13 @@
 """
-Модуль для загрузки истории сообщений из Telegram-чата за последние 7 дней через Telethon (user session).
+Модуль для работы с историей сообщений из Telegram-чатов через Telethon (user session).
 """
-import asyncio
 import re
 from datetime import datetime, timedelta
+from typing import List, Dict
 from telethon import TelegramClient
+from src.config.config import load_config
 
-from src.config.config import get_config
-
-config = get_config()
+config = load_config()
 
 API_ID = int(config['TELEGRAM_API_ID'])
 API_HASH = config['TELEGRAM_API_HASH']
@@ -17,6 +16,10 @@ SESSION_NAME = config['TELEGRAM_SESSION_NAME']
 DAY_OFFSET = config['DAY_OFFSET']
 IGNORED_PREFIXES = ['/start', '/help', '/telegram', '/command', '🎆Дай мне мудрость']
 IGNORED_SENDER_IDS = [177224227]
+
+
+def get_telegram_client():
+    return TelegramClient(SESSION_NAME, API_ID, API_HASH)
 
 
 def should_skip_message(msg) -> bool:
@@ -54,7 +57,7 @@ async def get_messages(chat_id_or_username: str, day_offset: int = DAY_OFFSET) -
     since = datetime.now() - timedelta(days=day_offset)
     messages = []
 
-    client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
+    client = get_telegram_client()
     await client.start(phone=PHONE)
 
     # Найдём нужный чат
@@ -96,9 +99,22 @@ async def get_messages(chat_id_or_username: str, day_offset: int = DAY_OFFSET) -
     return messages
 
 
-def get_last_week_messages(chat_id_or_username: str) -> list[dict]:
+async def get_list_chats() -> List[Dict]:
     """
-    Получить сообщения за последние 7 дней из чата (по chat_id или username).
-    Возвращает список dict'ов с ключами: id, date, sender_id, text
+    Возвращает список всех чатов пользователя (id, name, username) в виде JSON-объекта.
     """
-    return asyncio.run(get_messages(chat_id_or_username))
+    client = get_telegram_client()
+    await client.start(phone=PHONE)
+
+    chats = []
+    async for dialog in client.iter_dialogs():
+        chat_info = {
+            "id": dialog.id,
+            "name": dialog.name,
+            "username": getattr(dialog.entity, 'username', None)
+        }
+        chats.append(chat_info)
+
+    await client.disconnect()
+
+    return chats

@@ -6,12 +6,12 @@ from zoneinfo import ZoneInfo
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 
-from src.config.config import get_config
+from src.config.config import load_config
 from src.llm.client import summarize
 from src.telegram.sender import send_report_async
 from src.telegram.telethon import get_messages
 
-config = get_config()
+config = load_config()
 CHAT_ID = config['TELEGRAM_CHAT_ID']
 DAY_OFFSET = config['DAY_OFFSET']
 
@@ -38,7 +38,7 @@ async def schedule_weekly_job(chat_id: str = CHAT_ID):
     logging.info('Планировщик запущен. Выполняем задачу немедленно...')
 
     # 👇 Выполняем задачу сразу
-    await pipeline(chat_id)
+    # await pipeline(chat_id)
 
     scheduler.start()
     try:

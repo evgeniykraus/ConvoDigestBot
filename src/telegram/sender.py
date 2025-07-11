@@ -8,9 +8,9 @@ from aiogram import Bot
 from aiogram.enums import ParseMode
 from datetime import datetime
 
-from src.config.config import get_config
+from src.config.config import load_config
 
-config = get_config()
+config = load_config()
 BOT_TOKEN = config['BOT_TOKEN']
 
 

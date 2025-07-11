@@ -15,7 +15,7 @@ def get_ignored_sender_ids() -> List[str]:
         {sender_id for sender_id in os.getenv('IGNORED_SENDER_IDS', '').replace(' ', '').split(',') if sender_id})
 
 
-def get_config():
+def load_config():
     return {
         'BOT_TOKEN': os.getenv('BOT_TOKEN'),
         'TELEGRAM_CHAT_ID': os.getenv('TELEGRAM_CHAT_ID'),
