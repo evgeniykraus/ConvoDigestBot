@@ -8,11 +8,12 @@ import logging
 
 from src.config.config import load_config
 from src.llm.client import summarize
-from src.telegram.sender import send_report_async
+from src.telegram.sender import send_report
 from src.telegram.telethon import get_messages
 
 config = load_config()
 CHAT_ID = config['TELEGRAM_CHAT_ID']
+TELEGRAM_DIST_CHAT_ID = config['TELEGRAM_DIST_CHAT_ID']
 DAY_OFFSET = config['DAY_OFFSET']
 
 
@@ -24,7 +25,7 @@ async def pipeline(chat_id: str = CHAT_ID):
         logging.info(f'Загружено сообщений: {len(messages)} из чата с ID: {chat_id}')
         logging.info('Началась обработка сообщений в LLM...')
         report = await summarize(messages)
-        await send_report_async(report, '-1002551893104')
+        await send_report(report, TELEGRAM_DIST_CHAT_ID)
         logging.info('Отчёт успешно отправлен!')
     except Exception as e:
         logging.error(f'Ошибка в пайплайне: {str(e)}', exc_info=True)
@@ -36,9 +37,8 @@ async def schedule_weekly_job(chat_id: str = CHAT_ID):
     scheduler = AsyncIOScheduler(timezone=ZoneInfo("Europe/Moscow"))
     scheduler.add_job(pipeline, 'cron', day_of_week='sun', hour=18, minute=0, args=[chat_id])
     logging.info('Планировщик запущен. Выполняем задачу немедленно...')
-
     # 👇 Выполняем задачу сразу
-    # await pipeline(chat_id)
+    await pipeline(chat_id)
 
     scheduler.start()
     try:

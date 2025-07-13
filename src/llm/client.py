@@ -52,14 +52,19 @@ async def summarize(messages: List[Dict], model: str = OPENAI_API_MODEL) -> Dict
         logging.error(f"Ошибка в summarize_chunk: {error_message}")
         raise Exception(error_message)
 
+    # Если только один чанк, сразу суммаризируем и готовим отчет
+    if len(chunks) == 1:
+        partial = await summarize_chunk(chunks[0], model=model)
+        return await prepare_report(partial)
+
+    # Если несколько чанков - суммаризируем каждый, потом объединяем
     partial_summaries = []
     for chunk in chunks:
         partial = await summarize_chunk(chunk, model=model)
         partial_summaries.append(partial)
 
-    # Сразу склеиваем без повторного LLM
-    result = merge_partial_summaries(partial_summaries)
-    return await prepare_report(result)
+    merged_result = merge_partial_summaries(partial_summaries)
+    return await prepare_report(merged_result)
 
 
 def split_messages(messages: List[Dict], max_tokens: int = MAX_TOKENS_PER_CHUNK) -> List[List[Dict]]:

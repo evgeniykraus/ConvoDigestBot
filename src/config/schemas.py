@@ -9,8 +9,7 @@ RESPONSE_FORMAT = {
                 "main_fragments": {
                     "type": "array",
                     "items": {
-                        "type": "string",
-                        "maxLength": 200
+                        "type": "string"
                     },
                     "maxItems": 5,
                     "description": "Главные фрагменты недели (всё, что обсуждалось, смешило или бесило)"
@@ -18,8 +17,7 @@ RESPONSE_FORMAT = {
                 "failures_and_rage": {
                     "type": "array",
                     "items": {
-                        "type": "string",
-                        "maxLength": 200
+                        "type": "string"
                     },
                     "maxItems": 5,
                     "description": "Где всё пошло по п***е"
@@ -27,8 +25,7 @@ RESPONSE_FORMAT = {
                 "topics_to_discuss": {
                     "type": "array",
                     "items": {
-                        "type": "string",
-                        "maxLength": 200
+                        "type": "string"
                     },
                     "maxItems": 5,
                     "description": "Темы, которые точно надо добить/обсудить"

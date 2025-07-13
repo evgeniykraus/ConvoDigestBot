@@ -2,8 +2,6 @@
 Модуль для отправки итогового отчёта в Telegram-чат через aiogram (Bot API).
 """
 import html
-import os
-import asyncio
 from aiogram import Bot
 from aiogram.enums import ParseMode
 from datetime import datetime
@@ -46,22 +44,15 @@ def format_report(report_json: dict) -> str:
             parts.append(f"{i}. {escape_html(item)}")
         parts.append("")
 
-    # Хэштэг
-    parts.append("#нытинг\n")
+    hashtags = ' '.join(f"#{hashtag}" for hashtag in config['HASHTAGS'])
+    parts.append(f"{hashtags}\n")
 
     return '\n'.join(parts)
 
 
-async def send_report_async(report_json: dict, chat_id: str):
+async def send_report(report_json: dict, chat_id: str):
     bot = Bot(token=BOT_TOKEN)
     try:
         await bot.send_message(chat_id, format_report(report_json), parse_mode=ParseMode.HTML)
     finally:
         await bot.session.close()
-
-
-def send_report(report_json: dict, chat_id: str):
-    """
-    Отправляет текст отчёта в указанный чат через Telegram Bot API.
-    """
-    asyncio.run(send_report_async(report_json, chat_id))
