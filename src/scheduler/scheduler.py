@@ -9,7 +9,7 @@ import logging
 from src.config.config import load_config
 from src.llm.client import summarize
 from src.telegram.sender import send_report
-from src.telegram.telethon import get_messages
+from src.telegram.telethon_client import get_messages
 
 config = load_config()
 CHAT_ID = config['TELEGRAM_CHAT_ID']

@@ -15,7 +15,7 @@ def load_config():
         'TELEGRAM_API_ID': int(os.getenv('TELEGRAM_API_ID')),
         'TELEGRAM_API_HASH': os.getenv('TELEGRAM_API_HASH'),
         'TELEGRAM_PHONE': os.getenv('TELEGRAM_PHONE'),
-        'TELEGRAM_SESSION_NAME': os.getenv('TELEGRAM_SESSION_NAME'),
+        'TELEGRAM_SESSION_NAME': os.getenv('TELEGRAM_SESSION_NAME', 'anon'),
         'MAX_TOKENS_PER_CHUNK': int(os.getenv('MAX_TOKENS_PER_CHUNK', 3000)),
         'IGNORED_SENDER_IDS': extract_list_from_env('IGNORED_SENDER_IDS', convert_type=int),
         'DAY_OFFSET': abs(int(os.getenv('DAY_OFFSET', 7))),
@@ -23,6 +23,7 @@ def load_config():
         'OPENAI_API_KEY': os.getenv('OPENAI_API_KEY'),
         'OPENAI_API_BASE_URL': os.getenv('OPENAI_API_BASE_URL'),
         'OPENAI_API_MODEL': os.getenv('OPENAI_API_MODEL'),
+        'TELEGRAM_OWNER_ID': os.getenv('TELEGRAM_OWNER_ID'),
     }
 
 

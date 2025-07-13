@@ -17,6 +17,9 @@ async def create_telethon_session():
         print("[Telethon] Авторизация завершена!")
     else:
         print("[Telethon] Уже авторизован.")
+    # Получаем user_id владельца сессии
+    me = await client.get_me()
+    print(f"[Telethon] Ваш user_id: {me.id}")
     await client.disconnect()
 
 if __name__ == "__main__":
