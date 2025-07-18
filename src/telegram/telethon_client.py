@@ -37,70 +37,39 @@ async def get_messages(chat_id_or_username: str, day_offset: int = DAY_OFFSET) -
     async for msg in client.iter_messages(entity):
         if msg.date.replace(tzinfo=None) < since:
             break
-        if msg.text and not should_skip_message(msg):
-            messages.insert(0, {
+        # Собираем полный контекст сообщения
+        if (getattr(msg, 'text', None) or getattr(msg, 'caption', None) or getattr(msg, 'media',
+                                                                                   None)) and not should_skip_message(
+                msg):
+            # Корректно извлекаем имя файла документа
+            document_name = ''
+            if hasattr(msg, 'document') and msg.document:
+                for attr in getattr(msg.document, 'attributes', []):
+                    # DocumentAttributeFilename — только у файлов
+                    if hasattr(attr, 'file_name'):
+                        document_name = attr.file_name
+                        break
+
+            message_data = {
                 'id': msg.id,
                 'date': msg.date.isoformat(),
                 'username': get_formatted_username(msg.sender),
                 'reply_to': msg.reply_to_msg_id,
-                'text': msg.text
-            })
+                'text': getattr(msg, 'text', '') or '',
+                'caption': getattr(msg, 'caption', '') or '',
+                'photo': hasattr(msg, 'photo') and msg.photo is not None,
+                'document': hasattr(msg, 'document') and msg.document is not None,
+                'document_name': document_name,
+                'video': hasattr(msg, 'video') and msg.video is not None,
+                'voice': hasattr(msg, 'voice') and msg.voice is not None,
+                'media_type': type(msg.media).__name__ if getattr(msg, 'media', None) else '',
+                'links': re.findall(r'(https?://\S+)',
+                                    (getattr(msg, 'text', '') or '') + (getattr(msg, 'caption', '') or ''))
+            }
+            messages.insert(0, message_data)
 
     await client.disconnect()
     return messages
-
-
-async def get_messages_tree(chat_id_or_username: str, day_offset: int = DAY_OFFSET) -> str:
-    """
-    Преобразует плоский список сообщений в линейный текст с отступами, отражающими иерархию.
-
-    Args:
-        chat_id_or_username: ID или имя пользователя чата.
-        day_offset: Количество дней для загрузки сообщений.
-
-    Returns:
-        Строка, представляющая переписку с отступами для вложенных сообщений.
-        Возвращает пустую строку, если нет сообщений.
-    """
-    messages = await get_messages(chat_id_or_username, day_offset)
-
-    # Если нет сообщений, возвращаем пустую строку
-    if not messages:
-        return ""
-
-    # Словарь для хранения сообщений по ID
-    messages_dict = {msg['id']: {**msg, 'children': []} for msg in messages}
-
-    # Список корневых сообщений
-    root_messages = []
-
-    # Строим иерархию
-    for msg_id, msg_data in messages_dict.items():
-        reply_to = msg_data['reply_to']
-        if reply_to and reply_to in messages_dict:
-            # Если сообщение отвечает на другое, добавляем его как потомка
-            messages_dict[reply_to]['children'].append(msg_data)
-        else:
-            # Если нет reply_to или родитель не найден, это корневое сообщение
-            root_messages.append(msg_data)
-
-    # Сортируем корневые сообщения по дате (от старых к новым)
-    root_messages.sort(key=lambda x: x['date'])
-
-    # Сортируем потомков каждого сообщения по дате
-    for msg in messages_dict.values():
-        msg['children'].sort(key=lambda x: x['date'])
-
-    # Формируем линейный текст с отступами
-    def format_message(msg, indent: int = 0) -> str:
-        result = ["  " * indent + f"{msg['username']}: {msg['text']}"]
-        for child in msg['children']:
-            result.append(format_message(child, indent + 1))
-        return "\n".join(result)
-
-    result = [format_message(msg) for msg in root_messages]
-    print(f"Built text with {len(result)} root messages")
-    return "\n".join(result)
 
 
 def should_skip_message(msg) -> bool:

@@ -23,7 +23,7 @@ async def pipeline(chat_id: str = CHAT_ID):
     try:
         messages = await get_messages(chat_id)
         logging.info(f'Загружено сообщений: {len(messages)} из чата с ID: {chat_id}')
-        logging.info('Началась обработка сообщений в LLM...')
+        logging.info('Началась обработка сообщений через RAG...')
         report = await summarize(messages)
         await send_report(report, TELEGRAM_DIST_CHAT_ID)
         logging.info('Отчёт успешно отправлен!')

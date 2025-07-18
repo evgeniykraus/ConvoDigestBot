@@ -1,7 +1,12 @@
+
+from pydantic import BaseModel, Field
+
 RESPONSE_FORMAT = {
     "type": "json_schema",
     "json_schema": {
         "name": "chat_summary",
+        "title": "chat_summary",
+        "description": "Структурированный отчет по чату за неделю",
         "strict": True,
         "schema": {
             "type": "object",
@@ -36,3 +41,8 @@ RESPONSE_FORMAT = {
         }
     }
 }
+
+class LLMResponse(BaseModel):
+    main_fragments: list = Field(description="Главные фрагменты отчета")
+    failures_and_rage: list = Field(description="Ошибки и негативные моменты")
+    topics_to_discuss: list = Field(description="Темы для обсуждения")

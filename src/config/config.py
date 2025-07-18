@@ -7,6 +7,17 @@ load_dotenv()
 
 
 def load_config():
+    llm_provider = os.getenv('LLM_PROVIDER', 'openai')
+    llm_model = os.getenv('LLM_MODEL', os.getenv('LLM_MODEL', 'gpt-3.5-turbo'))
+    llm_base_url = os.getenv('LLM_BASE_URL', os.getenv('LLM_BASE_URL'))
+    llm_api_key = os.getenv('LLM_API_KEY', os.getenv('LLM_API_KEY', ''))
+
+    rag_model = os.getenv('RAG_MODEL', os.getenv('RAG_MODEL', 'text-embedding-3-small'))
+    rag_base_url = os.getenv('RAG_BASE_URL', os.getenv('RAG_BASE_URL'))
+    rag_api_key = os.getenv('RAG_API_KEY', os.getenv('RAG_API_KEY'))
+    rag_query = os.getenv('RAG_QUERY', 'Главные события недели, факапы, темы для обсуждения')
+    rag_top_k = int(os.getenv('RAG_TOP_K', 50))
+
     return {
         'BOT_TOKEN': os.getenv('BOT_TOKEN'),
         'MODE': os.environ.get("MODE", "both").lower(),
@@ -16,14 +27,23 @@ def load_config():
         'TELEGRAM_API_HASH': os.getenv('TELEGRAM_API_HASH'),
         'TELEGRAM_PHONE': os.getenv('TELEGRAM_PHONE'),
         'TELEGRAM_SESSION_NAME': os.getenv('TELEGRAM_SESSION_NAME', 'anon'),
-        'MAX_TOKENS_PER_CHUNK': int(os.getenv('MAX_TOKENS_PER_CHUNK', 3000)),
         'IGNORED_SENDER_IDS': extract_list_from_env('IGNORED_SENDER_IDS', convert_type=int),
         'DAY_OFFSET': abs(int(os.getenv('DAY_OFFSET', 7))),
         'HASHTAGS': extract_list_from_env('HASHTAGS', convert_type=str),
-        'OPENAI_API_KEY': os.getenv('OPENAI_API_KEY'),
-        'OPENAI_API_BASE_URL': os.getenv('OPENAI_API_BASE_URL'),
-        'OPENAI_API_MODEL': os.getenv('OPENAI_API_MODEL'),
         'TELEGRAM_OWNER_ID': os.getenv('TELEGRAM_OWNER_ID'),
+        'LLM_CONFIG': {
+            'provider': llm_provider,
+            'model': llm_model,
+            'base_url': llm_base_url,
+            'api_key': llm_api_key,
+        },
+        'RAG_CONFIG': {
+            'model': rag_model,
+            'base_url': rag_base_url,
+            'api_key': rag_api_key,
+            'query': rag_query,
+            'top_k': rag_top_k
+        }
     }
 
 
